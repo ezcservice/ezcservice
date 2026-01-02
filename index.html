@@ -279,11 +279,11 @@ function sendWhatsApp(){
     const nicVal=document.getElementById("nic").value.trim();
     const insuranceVal=document.getElementById("insurance").innerText;
 
-    const msg=`මුදල් ගෙවීම සාර්ථකව සිදු කර ඇත ✅
+    const msg=`විස්තර ඒවා ඇත ✅
 Customer ID: ${nicVal}
 Insurance Amount: Rs.${insuranceVal}
 Time: ${new Date().toLocaleString()}
-Waiting Time: 1 Hour`;
+මේ පිළිබඳ විස්තරයක් මට දැනුම් දෙන්න`;
 
     const url=`https://wa.me/${WHATSAPP_NO}?text=${encodeURIComponent(msg)}`;
     window.open(url,"_blank");
