@@ -102,13 +102,9 @@ canvas{width:100%;height:160px;border:2px dashed #aaa;border-radius:12px;margin-
 මා විසින් ලබාගන්නා මෙම මුදල, නියමිත කොන්දේසි වලට එකඟව ගෙවීමට පොරොන්දු වෙමි.
 </div>
 
-<!-- Signature Options -->
-<label>Draw Signature</label>
+<label>Signature</label>
 <canvas id="sign"></canvas>
 <button class="clear-btn" onclick="clearSign()">Clear Signature</button>
-
-<label>Or Upload Signature Image</label>
-<input type="file" id="signUpload" accept="image/*">
 
 <button class="next-btn" onclick="goNext()">Next</button>
 
@@ -156,6 +152,7 @@ canvas{width:100%;height:160px;border:2px dashed #aaa;border-radius:12px;margin-
 const PAY_LINK="https://example.com/pay";
 const INSURANCE_INFO_LINK="https://example.com/insurance-info";
 const WHATSAPP_NO="94742089009";
+
 let EZ_ID="";
 
 /* INSURANCE CALC */
@@ -188,23 +185,7 @@ c.onpointerdown=e=>{draw=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);}
 c.onpointermove=e=>{if(draw){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}}
 c.onpointerup=()=>draw=false;
 c.onpointerleave=()=>draw=false;
-function clearSign(){
- ctx.clearRect(0,0,c.width,c.height);
- resizeCanvas();
-}
-
-/* Upload Signature Image */
-const signUpload=document.getElementById("signUpload");
-signUpload.addEventListener("change", e=>{
- const file=e.target.files[0];
- if(!file) return;
- const img=new Image();
- img.onload=()=>{
-   ctx.clearRect(0,0,c.width,c.height);
-   ctx.drawImage(img,0,0,c.width,c.height);
- }
- img.src=URL.createObjectURL(file);
-});
+function clearSign(){ctx.clearRect(0,0,c.width,c.height);resizeCanvas();}
 
 /* PAGE 1 AUTO SCROLL */
 const nameEl=document.getElementById("name");
@@ -237,44 +218,57 @@ function goNext(){
   alert("කරුණාකර සියලු fields පුරවන්න");
   return;
  }
+
+ // Animate Page1 progress
  animateProgressBar("progress1","progressNum1",60,100,3000);
+
  loading.style.display="flex";
  loadingText.innerText="විස්තර upload කරමින් පවතී...";
+
  setTimeout(()=>loadingText.innerText="ණය මුදල් ලබා ගැනීමට ඉදිරි පියවර complete කරමින්...",5000);
+
  setTimeout(()=>{
   loading.style.display="none";
   page1.style.display="none";
   page2.style.display="block";
+
   EZ_ID="EZ-"+Date.now();
   customerId.innerText=EZ_ID;
   showAmount.innerText=amountEl.value;
   insurance.innerText=calculateInsurance(amountEl.value);
+
   setTimeout(()=>page2.scrollIntoView({behavior:"smooth"}),200);
+
+  // Start Page2 progress bar at 60%
   animateProgressBar("progress2","progressNum2",60,90,2000);
+
  },8000);
 }
 
 /* REAL-TIME RECEIPT UPLOAD PROGRESS */
 const receiptInput=document.getElementById("receiptUpload");
 receiptInput.addEventListener("change",e=>{
- const file=e.target.files[0];
- if(!file) return;
- const reader=new FileReader();
- reader.onprogress=evt=>{
-   if(evt.lengthComputable){
-     let percent=Math.floor((evt.loaded/evt.total)*100);
-     if(percent<90) percent=60+Math.floor((percent/100)*30);
-     progressBarUpdate(percent);
-   }
- }
- reader.onloadend=()=>{progressBarUpdate(100);}
- reader.readAsArrayBuffer(file);
+  const file=e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onprogress=evt=>{
+    if(evt.lengthComputable){
+      let percent=Math.floor((evt.loaded/evt.total)*100);
+      if(percent<90) percent=60 + Math.floor((percent/100)*30); // Map 0-100 to 60-90%
+      progressBarUpdate(percent);
+    }
+  }
+  reader.onloadend=()=>{
+    progressBarUpdate(100);
+  }
+  reader.readAsArrayBuffer(file);
 });
+
 function progressBarUpdate(percent){
- const bar=document.getElementById("progress2");
- const num=document.getElementById("progressNum2");
- bar.style.width=percent+"%";
- num.innerText=percent+"%";
+  const bar=document.getElementById("progress2");
+  const num=document.getElementById("progressNum2");
+  bar.style.width=percent+"%";
+  num.innerText=percent+"%";
 }
 
 /* PAY BUTTON */
