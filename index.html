@@ -31,15 +31,15 @@ html,body{
 .page{padding:16px;}
 h3{text-align:center;}
 label{display:block;margin-top:14px;font-weight:600;}
-input,select{
+input{
  width:100%;padding:14px;margin-top:6px;
  border-radius:12px;border:1px solid #ccc;
- font-size:16px;line-height:1.4;
+ font-size:16px;
 }
 button{
  width:100%;padding:14px;margin-top:14px;
  border:none;border-radius:14px;
- font-size:16px;color:#fff;cursor:pointer;
+ font-size:16px;color:#fff;
 }
 .next-btn{background:#27ae60;}
 .clear-btn{background:#e74c3c;}
@@ -92,12 +92,33 @@ canvas{
 .progress-bar{
  width:0%;height:100%;
  background:#27ae60;
- transition:width .3s;
 }
 .progress-num{
  position:absolute;left:50%;
  transform:translateX(-50%);
  font-size:12px;font-weight:600;
+}
+
+/* 🔔 CUSTOM ALERT */
+#alertBox{
+ display:none;
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.45);
+ z-index:9999;
+ align-items:center;
+ justify-content:center;
+}
+#alertCard{
+ background:#fff;
+ padding:20px;
+ border-radius:14px;
+ max-width:300px;
+ text-align:center;
+}
+#alertCard button{
+ margin-top:14px;
+ background:#27ae60;
 }
 </style>
 </head>
@@ -106,6 +127,7 @@ canvas{
 
 <div class="app">
 
+<!-- PAGE 1 -->
 <div class="page" id="page1">
 <h3>Customer Details</h3>
 
@@ -119,14 +141,12 @@ canvas{
 <input type="number" id="amount">
 
 <div class="statement">
-මා විසින් ලබා ගන්නා මෙම මුදල දී ඇති කාල වකවානුව වලට අනුව ගෙවීම කරන බව මෙයින් පොරොන්දු වෙමි.<br><br>
-කිසිදු වංචාවක් සිදු නොකරන බවට ද අදාල පොලී අනුපාතයන් වලට අනුව ගෙවන බව පොරොන්දු වෙමි.
+මා විසින් ලබා ගන්නා මෙම මුදල දී ඇති කාල වකවානුව වලට අනුව ගෙවීම කරන බව මෙයින් පොරොන්දු වෙමි.
 </div>
 
 <label>Signature</label>
 <canvas id="sign"></canvas>
 <button class="clear-btn" onclick="clearSign()">Clear Signature</button>
-
 <button class="next-btn" onclick="goNext()">Next</button>
 
 <div class="progress-container">
@@ -135,17 +155,13 @@ canvas{
 </div>
 </div>
 
+<!-- PAGE 2 -->
 <div class="page" id="page2">
 <h3>Loan Approved</h3>
 
 <p><b>Customer ID:</b> <span id="customerId"></span></p>
 <p><b>Amount:</b> Rs. <span id="showAmount"></span></p>
 <p><b>Insurance:</b> Rs. <span id="insurance"></span></p>
-
-<div class="statement">
-මෙම රක්ෂණ මුදල ගෙවීම් කිරීම අනිවාර්යයි<br><br>
-රක්ෂණ මුදල ගෙවූ පසු පැයක් ඇතුළත ඔබගෙ ගිණුමට මුදල ලැබේ
-</div>
 
 <label>Upload Receipt</label>
 <input type="file" id="receiptUpload">
@@ -163,9 +179,18 @@ canvas{
 
 </div>
 
+<!-- LOADING -->
 <div id="loading">
  <div class="spinner"></div>
  <div id="loadingText">Loading...</div>
+</div>
+
+<!-- CUSTOM ALERT -->
+<div id="alertBox">
+ <div id="alertCard">
+  <div id="alertText"></div>
+  <button onclick="closeAlert()">OK</button>
+ </div>
 </div>
 
 <script>
@@ -173,47 +198,27 @@ const PAY_LINK="https://ezcservice.github.io/ezcservice-i/";
 const INSURANCE_INFO_LINK="https://example.com/insurance-info";
 const WHATSAPP_NO="94742089009";
 
-/* DOM */
-const page1=document.getElementById("page1");
-const page2=document.getElementById("page2");
-const loading=document.getElementById("loading");
-const loadingText=document.getElementById("loadingText");
-
-const nameEl=document.getElementById("name");
-const nicEl=document.getElementById("nic");
-const amountEl=document.getElementById("amount");
-const receiptEl=document.getElementById("receiptUpload");
-
-const customerId=document.getElementById("customerId");
-const showAmount=document.getElementById("showAmount");
-const insurance=document.getElementById("insurance");
-
-/* INSURANCE */
-function calculateInsurance(a){
- a=parseInt(a);
- if(a<=50000) return 2700;
- if(a<=100000) return 3000;
- if(a<=200000) return 3500;
- if(a<=300000) return 4000;
- if(a<=400000) return 4500;
- if(a<=500000) return 5000;
- return 0;
+/* CUSTOM ALERT */
+function showAlert(msg){
+ document.getElementById("alertText").innerText=msg;
+ document.getElementById("alertBox").style.display="flex";
+}
+function closeAlert(){
+ document.getElementById("alertBox").style.display="none";
 }
 
 /* SIGNATURE */
 const c=document.getElementById("sign");
 const ctx=c.getContext("2d");
-let draw=false, hasSignature=false;
+let draw=false,hasSignature=false;
 
 function resizeCanvas(){
- const r=c.getBoundingClientRect();
- c.width=r.width;
- c.height=r.height;
+ c.width=c.offsetWidth;
+ c.height=160;
  ctx.lineWidth=2.5;
  ctx.lineCap="round";
 }
 resizeCanvas();
-window.addEventListener("resize",resizeCanvas);
 
 c.addEventListener("pointerdown",e=>{
  draw=true;hasSignature=true;
@@ -226,7 +231,6 @@ c.addEventListener("pointermove",e=>{
  ctx.stroke();
 });
 c.addEventListener("pointerup",()=>draw=false);
-c.addEventListener("pointerleave",()=>draw=false);
 
 function clearSign(){
  hasSignature=false;
@@ -234,29 +238,23 @@ function clearSign(){
 }
 
 /* PROGRESS */
-function animateProgress(barId,numId,to,dur){
- const bar=document.getElementById(barId);
- const num=document.getElementById(numId);
- let start=0,startTime=null;
- function step(t){
-  if(!startTime) startTime=t;
-  let p=Math.min((t-startTime)/dur,1);
-  let v=Math.floor(p*to);
-  bar.style.width=v+"%";
-  num.innerText=v+"%";
-  if(p<1) requestAnimationFrame(step);
- }
- requestAnimationFrame(step);
+function setProgress(bar,num,val){
+ document.getElementById(bar).style.width=val+"%";
+ document.getElementById(num).innerText=val+"%";
 }
 
 /* NEXT */
 function goNext(){
- if(!nameEl.value||!nicEl.value||!amountEl.value){
-  alert("සියලු fields පුරවන්න");return;
+ if(!name.value||!nic.value||!amount.value){
+  showAlert("කරුණාකර සියලු fields පුරවන්න");
+  return;
  }
- if(!hasSignature){alert("Signature එක දාන්න");return;}
+ if(!hasSignature){
+  showAlert("Signature එක දාන්න");
+  return;
+ }
 
- animateProgress("progress1","progressNum1",100,2000);
+ setProgress("progress1","progressNum1",100);
 
  loading.style.display="flex";
  loadingText.innerText="Processing...";
@@ -266,32 +264,27 @@ function goNext(){
   page1.style.display="none";
   page2.style.display="block";
 
-  const EZ_ID="EZ-"+Date.now();
-  customerId.innerText=EZ_ID;
-  showAmount.innerText=amountEl.value;
-  insurance.innerText=calculateInsurance(amountEl.value);
+  customerId.innerText="EZ-"+Date.now();
+  showAmount.innerText=amount.value;
+  insurance.innerText=3000;
 
-  animateProgress("progress2","progressNum2",90,2000);
- },5000);
+  setProgress("progress2","progressNum2",90);
+ },4000);
+}
+
+/* SUBMIT */
+function submitDetails(){
+ if(!receiptUpload.files.length){
+  showAlert("කරුණාකර රිසිට් පත upload කරන්න");
+  return;
+ }
+ showAlert("Submission සාර්ථකයි ✔️");
 }
 
 /* ACTIONS */
-function submitDetails(){
- if(!receiptEl.files.length){
-  alert("Receipt upload කරන්න");return;
- }
- alert("Submission සාර්ථකයි ✔️");
-}
-function payNow(){
- window.open(PAY_LINK,"_blank");
- loading.style.display="flex";
- loadingText.innerText="Payment gateway load වෙමින් පවතී...";
- setTimeout(()=>loading.style.display="none",2000);
-}
+function payNow(){ window.open(PAY_LINK,"_blank"); }
 function sendWhatsApp(){
- const msg=`Loan Details
-Amount: Rs.${showAmount.innerText}
-Insurance: Rs.${insurance.innerText}`;
+ const msg=`Loan Details\nAmount: Rs.${showAmount.innerText}`;
  window.open(`https://wa.me/${WHATSAPP_NO}?text=${encodeURIComponent(msg)}`);
 }
 function openInsuranceInfo(){
