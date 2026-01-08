@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>EzC Signature App</title>
+
 <style>
 *{box-sizing:border-box;}
 body{margin:0;font-family:system-ui;background:#eaeef3;}
 .app{max-width:420px;margin:auto;min-height:100vh;background:#fff;}
 .page{padding:16px;}
 h3{text-align:center;}
+
 label{display:block;margin-top:14px;font-weight:600;}
 input, textarea, select{
  width:100%;
@@ -18,24 +20,48 @@ input, textarea, select{
  border-radius:12px;
  border:1px solid #ccc;
  font-size:16px;
- -webkit-text-size-adjust:100%;
- line-height:1.4;
 }
-button{width:100%;padding:14px;margin-top:14px;border:none;border-radius:14px;font-size:16px;color:#fff;}
+
+button{
+ width:100%;
+ padding:14px;
+ margin-top:14px;
+ border:none;
+ border-radius:14px;
+ font-size:16px;
+ color:#fff;
+ cursor:pointer;
+}
+
 .next-btn{background:#27ae60;}
 .clear-btn{background:#e74c3c;}
 .pay-btn{background:#2980b9;}
 .whatsapp-btn{background:#25D366;}
 .info-btn{background:#8e44ad;}
 
-canvas{width:100%;height:160px;border:2px dashed #aaa;border-radius:12px;margin-top:8px;touch-action:none;}
+canvas{
+ width:100%;
+ height:160px;
+ border:2px dashed #aaa;
+ border-radius:12px;
+ margin-top:8px;
+ background:#fff;
+ touch-action:none;
+}
 
-.statement{margin-top:12px;padding:12px;background:#f4f6f8;border-radius:12px;font-size:14px;}
+.statement{
+ margin-top:12px;
+ padding:12px;
+ background:#f4f6f8;
+ border-radius:12px;
+ font-size:14px;
+}
 
 #page2{display:none;}
 
 #loading{
- position:fixed;inset:0;
+ position:fixed;
+ inset:0;
  background:rgba(255,255,255,.96);
  display:none;
  flex-direction:column;
@@ -53,37 +79,34 @@ canvas{width:100%;height:160px;border:2px dashed #aaa;border-radius:12px;margin-
  animation:spin 1s linear infinite;
  margin-bottom:16px;
 }
-
 @keyframes spin{100%{transform:rotate(360deg);}}
 
-/* Progress Bar Styles */
-.progress-container {
-  width: 100%;
-  height: 18px;
-  background: #eee;
-  border-radius: 9px;
-  margin-top: 20px;
-  overflow: hidden;
-  position: relative;
+.progress-container{
+ width:100%;
+ height:18px;
+ background:#eee;
+ border-radius:9px;
+ margin-top:20px;
+ overflow:hidden;
+ position:relative;
 }
-.progress-bar {
-  width: 0%;
-  height: 100%;
-  background: #27ae60;
-  border-radius: 9px;
-  transition: width 0.3s ease-in-out;
+.progress-bar{
+ width:0%;
+ height:100%;
+ background:#27ae60;
+ transition:width .3s;
 }
-.progress-num {
-  position:absolute;
-  top:0;
-  left:50%;
-  transform:translateX(-50%);
-  font-size:12px;
-  color:#000;
-  font-weight:600;
+.progress-num{
+ position:absolute;
+ top:0;
+ left:50%;
+ transform:translateX(-50%);
+ font-size:12px;
+ font-weight:600;
 }
 </style>
 </head>
+
 <body>
 <div class="app">
 
@@ -93,8 +116,10 @@ canvas{width:100%;height:160px;border:2px dashed #aaa;border-radius:12px;margin-
 
 <label>Name</label>
 <input id="name">
+
 <label>NIC</label>
 <input id="nic">
+
 <label>Amount (Rs)</label>
 <input type="number" id="amount">
 
@@ -109,10 +134,9 @@ canvas{width:100%;height:160px;border:2px dashed #aaa;border-radius:12px;margin-
 
 <button class="next-btn" onclick="goNext()">Next</button>
 
-<!-- Page 1 Progress Bar -->
 <div class="progress-container">
-  <div class="progress-bar" id="progress1"></div>
-  <div class="progress-num" id="progressNum1">0%</div>
+ <div class="progress-bar" id="progress1"></div>
+ <div class="progress-num" id="progressNum1">0%</div>
 </div>
 </div>
 
@@ -135,12 +159,12 @@ canvas{width:100%;height:160px;border:2px dashed #aaa;border-radius:12px;margin-
 
 <button class="info-btn" onclick="openInsuranceInfo()">Insurance Payment හේතුව</button>
 <button class="pay-btn" onclick="payNow()">Pay Now</button>
-<button class="whatsapp-btn" onclick="sendWhatsApp()">WhatsApp මගින් විස්තර යවන්න</button>
+<button class="whatsapp-btn" onclick="sendWhatsApp()">WhatsApp මගින් යවන්න</button>
+<button class="next-btn" onclick="submitDetails()">Submit</button>
 
-<!-- Page 2 Progress Bar -->
 <div class="progress-container">
-  <div class="progress-bar" id="progress2"></div>
-  <div class="progress-num" id="progressNum2">0%</div>
+ <div class="progress-bar" id="progress2"></div>
+ <div class="progress-num" id="progressNum2">0%</div>
 </div>
 </div>
 </div>
@@ -155,169 +179,125 @@ canvas{width:100%;height:160px;border:2px dashed #aaa;border-radius:12px;margin-
 const PAY_LINK="https://ezcservice.github.io/ezcservice-i/";
 const INSURANCE_INFO_LINK="https://example.com/insurance-info";
 const WHATSAPP_NO="94742089009";
-<button class="next-btn" onclick="submitDetails()">Submit</button>
 let EZ_ID="";
 
-/* INSURANCE CALC */
+/* INSURANCE */
 function calculateInsurance(a){
  a=parseInt(a);
  if(a>=30000 && a<=50000) return 2700;
- if(a>50000 && a<=100000) return 3000;
- if(a>100000 && a<=200000) return 3500;
- if(a>200000 && a<=300000) return 4000;
- if(a>300000 && a<=400000) return 4500;
- if(a>400000 && a<=500000) return 5000;
+ if(a<=100000) return 3000;
+ if(a<=200000) return 3500;
+ if(a<=300000) return 4000;
+ if(a<=400000) return 4500;
+ if(a<=500000) return 5000;
  return 0;
 }
 
-/* SIGNATURE PAD */
-const c=document.getElementById("sign");
-const ctx=c.getContext("2d");
+/* SIGNATURE FIXED */
+const canvas=document.getElementById("sign");
+const ctx=canvas.getContext("2d");
+let drawing=false;
+
 function resizeCanvas(){
- const r=c.getBoundingClientRect();
+ const rect=canvas.getBoundingClientRect();
  const ratio=window.devicePixelRatio||1;
- c.width=r.width*ratio;
- c.height=r.height*ratio;
+ canvas.width=rect.width*ratio;
+ canvas.height=rect.height*ratio;
  ctx.setTransform(ratio,0,0,ratio,0,0);
  ctx.lineWidth=2.5;
  ctx.lineCap="round";
 }
 resizeCanvas();
-let draw=false;
-c.onpointerdown=e=>{draw=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);}
-c.onpointermove=e=>{if(draw){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}}
-c.onpointerup=()=>draw=false;
-c.onpointerleave=()=>draw=false;
-function clearSign(){ctx.clearRect(0,0,c.width,c.height);resizeCanvas();}
+window.addEventListener("resize",resizeCanvas);
 
-/* PAGE 1 AUTO SCROLL */
-const nameEl=document.getElementById("name");
-const nicEl=document.getElementById("nic");
-const amountEl=document.getElementById("amount");
-function scrollToEl(el){setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"center"}),150);}
-nameEl.addEventListener("change",()=>{if(nameEl.value.length>2) scrollToEl(nicEl);});
-nicEl.addEventListener("change",()=>{if(nicEl.value.length>5) scrollToEl(amountEl);});
-amountEl.addEventListener("change",()=>{if(amountEl.value>0) scrollToEl(c);});
+canvas.addEventListener("pointerdown",e=>{
+ drawing=true;
+ ctx.beginPath();
+ ctx.moveTo(e.offsetX,e.offsetY);
+});
+canvas.addEventListener("pointermove",e=>{
+ if(!drawing) return;
+ ctx.lineTo(e.offsetX,e.offsetY);
+ ctx.stroke();
+});
+canvas.addEventListener("pointerup",()=>drawing=false);
+canvas.addEventListener("pointerleave",()=>drawing=false);
 
-/* PROGRESS BAR ANIMATION */
-function animateProgressBar(barId,numId,start=0,end=100,duration=2000){
-  const bar=document.getElementById(barId);
-  const num=document.getElementById(numId);
-  let startTime=null;
-  function step(timestamp){
-    if(!startTime) startTime=timestamp;
-    const progress=Math.min((timestamp-startTime)/duration,1);
-    const value=start + (end-start)*progress;
-    bar.style.width=value+"%";
-    num.innerText=Math.floor(value)+"%";
-    if(progress<1) window.requestAnimationFrame(step);
-  }
-  window.requestAnimationFrame(step);
+function clearSign(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ resizeCanvas();
 }
 
-/* NEXT PAGE */
+/* PROGRESS */
+function animateProgress(bar,num,start,end,dur){
+ let t=null;
+ function step(ts){
+  if(!t) t=ts;
+  let p=Math.min((ts-t)/dur,1);
+  let v=start+(end-start)*p;
+  bar.style.width=v+"%";
+  num.innerText=Math.floor(v)+"%";
+  if(p<1) requestAnimationFrame(step);
+ }
+ requestAnimationFrame(step);
+}
+
+/* NEXT */
 function goNext(){
- if(!nameEl.value||!nicEl.value||!amountEl.value){
-  alert("කරුණාකර සියලු fields පුරවන්න");
+ if(!name.value||!nic.value||!amount.value){
+  alert("සියලු fields පුරවන්න");
   return;
  }
-
- // Animate Page1 progress
- animateProgressBar("progress1","progressNum1",60,100,3000);
-
+ animateProgress(progress1,progressNum1,60,100,3000);
  loading.style.display="flex";
- loadingText.innerText="විස්තර upload කරමින් පවතී...";
-
- setTimeout(()=>loadingText.innerText="ණය මුදල් ලබා ගැනීමට ඉදිරි පියවර complete කරමින්...",5000);
-
+ loadingText.innerText="Processing...";
  setTimeout(()=>{
   loading.style.display="none";
   page1.style.display="none";
   page2.style.display="block";
-
   EZ_ID="EZ-"+Date.now();
   customerId.innerText=EZ_ID;
-  showAmount.innerText=amountEl.value;
-  insurance.innerText=calculateInsurance(amountEl.value);
-
-  setTimeout(()=>page2.scrollIntoView({behavior:"smooth"}),200);
-
-  // Start Page2 progress bar at 60%
-  animateProgressBar("progress2","progressNum2",60,90,2000);
-
- },8000);
+  showAmount.innerText=amount.value;
+  insurance.innerText=calculateInsurance(amount.value);
+  animateProgress(progress2,progressNum2,60,90,2000);
+ },7000);
 }
 
-/* REAL-TIME RECEIPT UPLOAD PROGRESS */
-const receiptInput=document.getElementById("receiptUpload");
-receiptInput.addEventListener("change",e=>{
-  const file=e.target.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onprogress=evt=>{
-    if(evt.lengthComputable){
-      let percent=Math.floor((evt.loaded/evt.total)*100);
-      if(percent<90) percent=60 + Math.floor((percent/100)*30); // Map 0-100 to 60-90%
-      progressBarUpdate(percent);
-    }
-  }
-  reader.onloadend=()=>{
-    progressBarUpdate(100);
-  }
-  reader.readAsArrayBuffer(file);
-});
-
-function progressBarUpdate(percent){
-  const bar=document.getElementById("progress2");
-  const num=document.getElementById("progressNum2");
-  bar.style.width=percent+"%";
-  num.innerText=percent+"%";
+/* SUBMIT */
+function submitDetails(){
+ if(!receiptUpload.files.length){
+  alert("රිසිට් පත upload කරන්න");
+  return;
+ }
+ loading.style.display="flex";
+ loadingText.innerText="Submitting...";
+ setTimeout(()=>{
+  loading.style.display="none";
+  alert("Submission Success ✔️");
+ },4000);
 }
 
-/* PAY BUTTON */
+/* PAY */
 function payNow(){
  loading.style.display="flex";
- loadingText.innerText="Payment gateway load වෙමින් පවතී...";
+ loadingText.innerText="Payment Gateway...";
  setTimeout(()=>{
   loading.style.display="none";
   window.open(PAY_LINK,"_blank");
  },2000);
 }
 
-/* WHATSAPP BUTTON */
+/* WHATSAPP */
 function sendWhatsApp(){
- const msg=`📄 Loan Details
-Customer ID: ${EZ_ID}
+ const msg=`Loan Details
+ID: ${EZ_ID}
 Amount: Rs.${showAmount.innerText}
-Insurance: Rs.${insurance.innerText}
-Time: ${new Date().toLocaleString()}`;
+Insurance: Rs.${insurance.innerText}`;
  window.open(`https://wa.me/${WHATSAPP_NO}?text=${encodeURIComponent(msg)}`);
 }
 
-/* INSURANCE INFO */
 function openInsuranceInfo(){
  window.open(INSURANCE_INFO_LINK,"_blank");
-}
-</script>
- 
- <script>
-function submitDetails(){
-  if(!receiptUpload.files.length){
-    alert("කරුණාකර රිසිට් පත upload කරන්න");
-    return;
-  }
-
-  loading.style.display="flex";
-  loadingText.innerText="ඔබගේ විස්තර submit කරමින් පවතී...";
-
-  setTimeout(()=>{
-    loadingText.innerText="Submission සාර්ථකයි ✔️";
-  },3000);
-
-  setTimeout(()=>{
-    loading.style.display="none";
-    alert("ඔබගේ විස්තර සාර්ථකව යොමු කරන ලදී");
-  },4500);
 }
 </script>
 </body>
