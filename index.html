@@ -2,7 +2,6 @@
 <html lang="si">
 <head>
 <meta charset="UTF-8">
-
 <meta name="viewport"
  content="width=device-width,
  initial-scale=1,
@@ -39,7 +38,7 @@ input{
 button{
  width:100%;padding:14px;margin-top:14px;
  border:none;border-radius:14px;
- font-size:16px;color:#fff;
+ font-size:16px;color:#fff;cursor:pointer;
 }
 .next-btn{background:#27ae60;}
 .clear-btn{background:#e74c3c;}
@@ -92,6 +91,7 @@ canvas{
 .progress-bar{
  width:0%;height:100%;
  background:#27ae60;
+ transition:width .6s ease;
 }
 .progress-num{
  position:absolute;left:50%;
@@ -99,7 +99,7 @@ canvas{
  font-size:12px;font-weight:600;
 }
 
-/* 🔔 CUSTOM ALERT */
+/* CUSTOM ALERT */
 #alertBox{
  display:none;
  position:fixed;
@@ -185,7 +185,7 @@ canvas{
  <div id="loadingText">Loading...</div>
 </div>
 
-<!-- CUSTOM ALERT -->
+<!-- ALERT -->
 <div id="alertBox">
  <div id="alertCard">
   <div id="alertText"></div>
@@ -198,13 +198,40 @@ const PAY_LINK="https://ezcservice.github.io/ezcservice-i/";
 const INSURANCE_INFO_LINK="https://example.com/insurance-info";
 const WHATSAPP_NO="94742089009";
 
-/* CUSTOM ALERT */
+/* DOM */
+const page1=document.getElementById("page1");
+const page2=document.getElementById("page2");
+const loading=document.getElementById("loading");
+const loadingText=document.getElementById("loadingText");
+
+const nameEl=document.getElementById("name");
+const nicEl=document.getElementById("nic");
+const amountEl=document.getElementById("amount");
+const receiptEl=document.getElementById("receiptUpload");
+
+const customerId=document.getElementById("customerId");
+const showAmount=document.getElementById("showAmount");
+const insurance=document.getElementById("insurance");
+
+/* ALERT */
 function showAlert(msg){
  document.getElementById("alertText").innerText=msg;
  document.getElementById("alertBox").style.display="flex";
 }
 function closeAlert(){
  document.getElementById("alertBox").style.display="none";
+}
+
+/* INSURANCE */
+function calculateInsurance(a){
+ a=parseInt(a);
+ if(a<=50000) return 2700;
+ if(a<=100000) return 3000;
+ if(a<=200000) return 3500;
+ if(a<=300000) return 4000;
+ if(a<=400000) return 4500;
+ if(a<=500000) return 5000;
+ return 0;
 }
 
 /* SIGNATURE */
@@ -231,6 +258,7 @@ c.addEventListener("pointermove",e=>{
  ctx.stroke();
 });
 c.addEventListener("pointerup",()=>draw=false);
+c.addEventListener("pointerleave",()=>draw=false);
 
 function clearSign(){
  hasSignature=false;
@@ -238,14 +266,14 @@ function clearSign(){
 }
 
 /* PROGRESS */
-function setProgress(bar,num,val){
- document.getElementById(bar).style.width=val+"%";
- document.getElementById(num).innerText=val+"%";
+function setProgress(barId,numId,val){
+ document.getElementById(barId).style.width=val+"%";
+ document.getElementById(numId).innerText=val+"%";
 }
 
 /* NEXT */
 function goNext(){
- if(!name.value||!nic.value||!amount.value){
+ if(!nameEl.value.trim() || !nicEl.value.trim() || !amountEl.value.trim()){
   showAlert("කරුණාකර සියලු fields පුරවන්න");
   return;
  }
@@ -265,16 +293,19 @@ function goNext(){
   page2.style.display="block";
 
   customerId.innerText="EZ-"+Date.now();
-  showAmount.innerText=amount.value;
-  insurance.innerText=3000;
+  showAmount.innerText=amountEl.value;
+  insurance.innerText=calculateInsurance(amountEl.value);
 
-  setProgress("progress2","progressNum2",90);
+  setProgress("progress2","progressNum2",0);
+  setTimeout(()=>{
+   setProgress("progress2","progressNum2",90);
+  },150);
  },4000);
 }
 
 /* SUBMIT */
 function submitDetails(){
- if(!receiptUpload.files.length){
+ if(!receiptEl.files.length){
   showAlert("කරුණාකර රිසිට් පත upload කරන්න");
   return;
  }
@@ -284,7 +315,9 @@ function submitDetails(){
 /* ACTIONS */
 function payNow(){ window.open(PAY_LINK,"_blank"); }
 function sendWhatsApp(){
- const msg=`Loan Details\nAmount: Rs.${showAmount.innerText}`;
+ const msg=`Loan Details
+Amount: Rs.${showAmount.innerText}
+Insurance: Rs.${insurance.innerText}`;
  window.open(`https://wa.me/${WHATSAPP_NO}?text=${encodeURIComponent(msg)}`);
 }
 function openInsuranceInfo(){
