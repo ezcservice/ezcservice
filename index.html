@@ -89,14 +89,17 @@ canvas{
  position:relative;
 }
 .progress-bar{
- width:0%;height:100%;
+ width:0%;
+ height:100%;
  background:#27ae60;
  transition:width .6s ease;
 }
 .progress-num{
- position:absolute;left:50%;
+ position:absolute;
+ left:50%;
  transform:translateX(-50%);
- font-size:12px;font-weight:600;
+ font-size:12px;
+ font-weight:600;
 }
 
 /* CUSTOM ALERT */
@@ -296,10 +299,15 @@ function goNext(){
   showAmount.innerText=amountEl.value;
   insurance.innerText=calculateInsurance(amountEl.value);
 
-  setProgress("progress2","progressNum2",0);
+  // ✅ FINAL FIX FOR PAGE 2 PROGRESS
+  document.getElementById("progress2").style.width="0%";
+  document.getElementById("progressNum2").innerText="0%";
+
   setTimeout(()=>{
-   setProgress("progress2","progressNum2",90);
-  },150);
+   document.getElementById("progress2").style.width="90%";
+   document.getElementById("progressNum2").innerText="90%";
+  },300);
+
  },4000);
 }
 
