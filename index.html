@@ -99,7 +99,8 @@ canvas{width:100%;height:160px;border:2px dashed #aaa;border-radius:12px;margin-
 <input type="number" id="amount">
 
 <div class="statement">
-මා විසින් ලබාගන්නා මෙම මුදල, නියමිත කොන්දේසි වලට එකඟව ගෙවීමට පොරොන්දු වෙමි.
+මා විසින් ලබා ගන්නා මෙම මුදල දී ඇති කාල වකවානුව වලට අනුව ගෙවීම කරන බව මෙයින් පොරොන්දු වෙමි. <br><br>
+කිසිදු වංචාවක් සිදු නොකරන බවට ද අදාල පොලී අනුපාතයන් වලට අනුව ගෙවන බව පොරොන්දු වෙමි.
 </div>
 
 <label>Signature</label>
@@ -124,7 +125,9 @@ canvas{width:100%;height:160px;border:2px dashed #aaa;border-radius:12px;margin-
 <p><b>Insurance:</b> Rs. <span id="insurance"></span></p>
 
 <div class="statement">
-රක්ෂණ මුදල ගෙවීමෙන් පසු පැයක් ඇතුළත මුදල් බැර කෙරේ.
+මෙම රක්ෂණ මුදල ගෙවීම් කිරීම අනිවාර්යයි. <br><br>
+රක්ෂණ මුදල ගෙවූ පසු ඔබගේ ණය මුදල පැයක් වැනි කාලයක් ඇතුළත ඔබගේ ගිණුමට ස්වයංක්‍රියව ලැබෙනු ඇත. <br><br>
+රක්ෂණ මුදල ගෙවූ රිසිට් පත මෙහි upload කරන්න.
 </div>
 
 <label>Upload Receipt</label>
@@ -152,7 +155,7 @@ canvas{width:100%;height:160px;border:2px dashed #aaa;border-radius:12px;margin-
 const PAY_LINK="https://ezcservice.github.io/ezcservice-i/";
 const INSURANCE_INFO_LINK="https://example.com/insurance-info";
 const WHATSAPP_NO="94742089009";
-
+<button class="next-btn" onclick="submitDetails()">Submit</button>
 let EZ_ID="";
 
 /* INSURANCE CALC */
@@ -294,6 +297,27 @@ Time: ${new Date().toLocaleString()}`;
 /* INSURANCE INFO */
 function openInsuranceInfo(){
  window.open(INSURANCE_INFO_LINK,"_blank");
+}
+</script>
+ 
+ <script>
+function submitDetails(){
+  if(!receiptUpload.files.length){
+    alert("කරුණාකර රිසිට් පත upload කරන්න");
+    return;
+  }
+
+  loading.style.display="flex";
+  loadingText.innerText="ඔබගේ විස්තර submit කරමින් පවතී...";
+
+  setTimeout(()=>{
+    loadingText.innerText="Submission සාර්ථකයි ✔️";
+  },3000);
+
+  setTimeout(()=>{
+    loading.style.display="none";
+    alert("ඔබගේ විස්තර සාර්ථකව යොමු කරන ලදී");
+  },4500);
 }
 </script>
 </body>
